@@ -17,19 +17,44 @@ public class Order {
     @Column(name = "order_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "order")
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "delivery_id") // 1:1 관계에서는 변경을 많이할 테이블에 소유 권한(Foreign key)을 준다
     private Delivery delivery;
 
     private LocalDateTime orderDate;
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    //==연관관계 메서드== 컨트롤 많이 하는 쪽에 있는 것이 좋다//
+    public void setMember(Member member) {
+        this.member = member;
+        member.getOrders().add(this);
+
+        /*
+            Member member = new Member();
+            Order order = new Order();
+
+            member.getOrders().add(order);
+            order.setMember(member);
+         */
+    }
+
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
+
+    public void setDelivery(Delivery delivery) {
+        this.delivery = delivery;
+        delivery.setOrder(this);
+    }
 
 }
