@@ -1,6 +1,7 @@
 package com.example.spring_basic.domain.item;
 
 import com.example.spring_basic.domain.Category;
+import com.example.spring_basic.exception.NotEnoughStockException;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -30,4 +31,24 @@ public abstract class Item {
     private List<Category> categories = new ArrayList<>();
 
 
+    // 엔티티 자체가 해결(비지니스 로직)할 수 있는 건 엔티티에서 해결하는 것이 객체지향적이다
+    // 밖에서 재고수량을 측정한 후 setStockQuantity로 하는 것 보다 엔티티에서 해결하는 것이 객체지향적이다.
+    /**
+     * 재고(stock) 증가
+     * @param quantity
+     */
+    public void addStock(int quantity){
+        this.stockQuantity += quantity;
+    }
+
+    /**
+     * 재고(stock) 감소
+     */
+    public void removeStock(int quantity){
+        int restStock = this.stockQuantity - quantity;
+        if(restStock < 0){
+            throw new NotEnoughStockException("need more stock");
+        }
+        this.stockQuantity = restStock;
+    }
 }
