@@ -1,13 +1,21 @@
 package com.example.spring_basic.domain;
 
 import com.example.spring_basic.domain.item.Item;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // protected로 기본 생성자를 만듦
+/*
+    protected로 기본생성자를 만드는 이유는
+    OrderItem을 생성할 때 다른 곳에서 new OrderItem() 로 새로 생성하지 못하게 하고
+    createOrderItem 메서드를 쓰도록 지향하기 위해
+*/
 public class OrderItem {
 
     @Id
