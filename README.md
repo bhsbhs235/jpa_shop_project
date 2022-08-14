@@ -44,3 +44,11 @@ Order에서 OrderItem을 조회하는 로직이 요구사항에서 필요하기 
   - 컨트롤러에서 엔티티를 생성하지 말자
   - 트랜잭션이 있는 서비스 계층에 식별자와 변경할 데이터를 명확하게 전달(dto 객체로)
   - 트랜잭션이 있는 서비스 계층에서 영속 상태의 엔티티를 조회하고, 엔티티의 데이터를 직접 변경
+- 영속성 컨텍스트 트랜잭션 범위
+  - Spring에서 Controller단의 경우 트랜잭션 범위 밖이기 때문에 읽기만 가능하며, 읽을때에도 영속성 컨텍스트에 등록은 된다.
+       (기본적으로 open-in-view : true이기 때문에)
+  - 하지만 말 그대로 "읽기"이기 때문에 persist / merge / flush 등을 호출시 에러를 터트려 트랜잭션 범위 밖에서는 값을 변경할 수 없다.
+  - 그럼에도 아래의 코드로 item의 price와 name이 변경되는 것은 1번에 의해 item은 영속성 컨텍스트로 관리되고 있었기 때문이고 orderService의 order()가 종료될 때 플러시 발생 -> 더티체킹 동작시 DB에서 불러왔을때와 다르니 정상적으로 update 발생
+  - 만약 application.yml에서 open-in-view : false로 변경 시
+   컨트롤러단에서 find 한 엔티티들은 영컨에 등록되지 않아
+   더티체킹도 안될 뿐더러 넘겨받은 member / item을 service단에서 그대로 사용하려 할 경우 에러 발생 (org.hibernate.LazyInitializationException: could not initialize proxy)
